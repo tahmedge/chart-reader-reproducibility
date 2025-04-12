@@ -1178,7 +1178,12 @@ def main_train(args):
     loss_weights = { "w_hm": 1.0, "w_loc": 1.0, "w_cls": 1.0, "w_regr": 0.1 }
 
     # --- Basic Setup ---
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    if torch.backends.mps.is_available():
+        device = torch.device('mps')
+    elif torch.cuda.is_available():
+        device = torch.device('cuda')
+    else:
+        device = torch.device('cpu')
     print(f"Using device: {device}")
 
     # --- Dataset & DataLoader ---
@@ -1614,7 +1619,12 @@ def main_inference(args):
         "nms_kernel": 3 # Keep fixed or add as arg
     }
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    if torch.backends.mps.is_available():
+        device = torch.device('mps')
+    elif torch.cuda.is_available():
+        device = torch.device('cuda')
+    else:
+        device = torch.device('cpu')
     print(f"Using device: {device}")
 
     if not infer_config["model_path"] or not os.path.isfile(infer_config["model_path"]):

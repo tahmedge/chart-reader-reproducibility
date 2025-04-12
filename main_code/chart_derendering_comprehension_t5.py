@@ -836,7 +836,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    if torch.backends.mps.is_available():
+        device = torch.device('mps')
+    elif torch.cuda.is_available():
+        device = torch.device('cuda')
+    else:
+        device = torch.device('cpu')
     print(f"Using device: {device}")
     random.seed(args.seed)
     np.random.seed(args.seed)
