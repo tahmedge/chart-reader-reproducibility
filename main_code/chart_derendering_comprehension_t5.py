@@ -707,7 +707,7 @@ def prepare_t5_input_for_inference(input_text_user, image_path, tokenizer, detec
         current_offset = end_offset + 1 if i < len(all_detected[:comp_limit]) - 1 else end_offset
     serialized_context = " ".join(context_str_parts)
 
-    prefix = f"Input: {input_text_user} Context: "
+    prefix = f"[S] {input_text_user} [SEP] "
     prefix_len = len(prefix)
     adjusted_items_map = {start + prefix_len: data for start, data in detected_items_map.items()}
     input_text_base = prefix + serialized_context
