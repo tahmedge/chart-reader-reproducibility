@@ -112,7 +112,6 @@ class HourglassNet(nn.Module):
             'output_feature_map': output_feature_map
         }
 
-# --- Positional Encoding ---
 class PositionalEncoding2D(nn.Module):
     def __init__(self, d_model, max_h=128, max_w=128):
         super().__init__()
@@ -371,7 +370,6 @@ class T5ForChartUnderstanding(T5ForConditionalGeneration):
         fused_norm = self.fused_embedding_layer_norm(fused)
         return fused_norm
 
-
     def forward(self,
                 input_ids=None,
                 attention_mask=None,
@@ -534,8 +532,10 @@ class ChartQADatasetCSV(Dataset):
                         types_tensor[token_idx] = item_data['type_id']
                         locations_tensor[token_idx] = torch.tensor(item_data['location'], dtype=torch.float)
                         feat = item_data['appearance']
-                        if feat.shape[0] == visual_dim: appearances_tensor[token_idx] = feat.to(dtype=torch.float)
-                        else: print(f"Warning: Feature dim mismatch for item {idx}, token {token_idx}. Expected {visual_dim}, got {feat.shape}. Using zeros.")
+                        if feat.shape[0] == visual_dim: 
+                            appearances_tensor[token_idx] = feat.to(dtype=torch.float)
+                        else: 
+                            print(f"Warning: Feature dim mismatch for item {idx}, token {token_idx}. Expected {visual_dim}, got {feat.shape}. Using zeros.")
                         break
             return {"input_ids": input_ids, "attention_mask": attention_mask, "labels": labels, "types": types_tensor, "locations": locations_tensor, "appearances": appearances_tensor, "variable_mapping": variable_mapping}
 
@@ -572,7 +572,8 @@ def train_t5_epoch(t5_model, dataloader, optimizer, scheduler, device, data_var_
     total_var_loss = 0
     start_time = time.time()
     for batch_idx, batch in enumerate(dataloader):
-        if batch is None: continue
+        if batch is None: 
+            continue
         try:
             input_ids = batch['input_ids'].to(device)
             attention_mask = batch['attention_mask'].to(device)
@@ -588,7 +589,8 @@ def train_t5_epoch(t5_model, dataloader, optimizer, scheduler, device, data_var_
             outputs = t5_model(input_ids=input_ids, attention_mask=attention_mask, labels=labels, types=types, locations=locations, appearances=appearances, return_dict=True)
             ce_loss = outputs.loss
             batch_input_var_ids = set()
-            for vm in variable_mappings: batch_input_var_ids.update(data_var_replacer.get_input_variable_token_ids(vm))
+            for vm in variable_mappings: 
+                batch_input_var_ids.update(data_var_replacer.get_input_variable_token_ids(vm))
             l_var = compute_data_variable_loss(outputs, labels, batch_input_var_ids)
             loss = ce_loss + alpha_lvar * l_var
         except Exception as e:
@@ -723,14 +725,16 @@ def prepare_t5_input_for_inference(input_text_user, image_path, tokenizer, detec
     appearances_tensor = torch.zeros(seq_len, visual_dim, dtype=torch.float)
 
     for token_idx, (start_char, end_char) in enumerate(offset_mapping):
-        if start_char == end_char: continue
+        if start_char == end_char: 
+            continue
         for item_start_offset, item_data in adjusted_items_map.items():
             item_end_offset = item_data['end_offset'] + prefix_len
             if max(start_char, item_start_offset) < min(end_char, item_end_offset):
                 types_tensor[token_idx] = item_data['type_id']
                 locations_tensor[token_idx] = torch.tensor(item_data['location'], dtype=torch.float)
                 feat = item_data['appearance']
-                if feat.shape[0] == visual_dim: appearances_tensor[token_idx] = feat.to(dtype=torch.float)
+                if feat.shape[0] == visual_dim: 
+                    appearances_tensor[token_idx] = feat.to(dtype=torch.float)
                 break
     types_tensor = types_tensor.unsqueeze(0)
     locations_tensor = locations_tensor.unsqueeze(0)
