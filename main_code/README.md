@@ -1,3 +1,10 @@
+**Installation**
+
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu # You may install CUDA version if you have GPU
+pip install transformers pandas numpy opencv-python Pillow nltk scikit-learn
+```
+
 **First run the component detector model**
 
 ```python chart_component_detector_hourglass.py --mode train --epochs 50 --batch_size 16 --save_dir ./hourglass_checkpoints```
