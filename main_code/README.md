@@ -24,7 +24,7 @@ python chart_derendering_comprehension_t5.py \
     --batch_size 4 \
     --lr 7e-4 \
     --num_workers 4 \
-    --save_interval 1
+    --save_interval 2
 ```
 
 **After the T5 training is finished, run the inference code**
